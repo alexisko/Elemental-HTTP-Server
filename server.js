@@ -3,16 +3,23 @@ const http = require('http');
 const fs = require('fs');
 const queryString = require('query-string');
 
-var body;
+var body, index;
 const server = http.createServer((req, res) => {
   //GET METHOD
   if(req.method === 'GET') {
     fs.exists("."+req.url, (exists) => {
       if(exists) { // If file exists, return html file in response body
-        res.statusCode = 200;
-        res.setHeader('Content-Type', 'text/html');
-        body = fs.readFileSync("."+req.url, 'utf8');
-        res.end(body);
+        if(req.url === '/public/css/styles.css') {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/css');
+          body = fs.readFileSync("."+req.url, 'utf8');
+          res.end(body);
+        } else {
+          res.statusCode = 200;
+          res.setHeader('Content-Type', 'text/html');
+          body = fs.readFileSync("."+req.url, 'utf8');
+          res.end(body);
+        }
       } else { //If file does not exist, return 404.html file in response body
         res.statusCode = 404;
         body = fs.readFileSync("./public/404.html", 'utf8');
@@ -22,7 +29,7 @@ const server = http.createServer((req, res) => {
   //POST METHOD
   } else if(req.method === 'POST') {
     if(req.url === "/elements") { // User needs to specifiy /elements path
-      var fileName, newFile;
+      var fileName, newFile, newLink;
       req.on('data', (chunk) => { // Read in request body
         body = chunk.toString();
         body = queryString.parse(body);
@@ -51,11 +58,22 @@ const server = http.createServer((req, res) => {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.end('{"success" : true}');
+            //Update index.html
+            // index = fs.readFileSync('./public/index.html', 'utf8');
+            // index = index.split("\n");
+            // newLink =  `
+            // <li>
+            //   <a href="public/${fileName}">${body.elementName}</a>
+            // </li>`;
+            // console.log("INDEX.HTML "+index);
           }
           //send diff status code
         });
       });
-
     }
+  } else if(req.method === 'PUT') {
+
+  } else if(req.method === 'DELETE') {
+
   }
 }).listen(8080);

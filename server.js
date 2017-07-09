@@ -41,7 +41,7 @@ const server = http.createServer((req, res) => {
             <head>
               <meta charset="UTF-8">
               <title>The Elements - ${body.elementName}</title>
-              <link rel="stylesheet" href="/css/styles.css">
+              <link rel="stylesheet" href="/public/css/styles.css">
             </head>
             <body>
               <h1>${body.elementName}</h1>

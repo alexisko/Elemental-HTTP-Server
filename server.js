@@ -5,8 +5,4 @@ const fs = require("fs");
 const server = http.createServer((req, res) => {
 
   res.end();
-});
-
-server.listen(8080, () => {
-
-});
+}).listen(8080);

@@ -3,22 +3,6 @@ const http = require('http');
 const fs = require('fs');
 const queryString = require('query-string');
 
-var newFile = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>The Elements - ${body.elementName}</title>
-  <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-  <h1>${body.elementName}</h1>
-  <h2>${body.elementSymbol}</h2>
-  <h3>Atomic number ${body.elementAtomicNumber}</h3>
-  <p>${body.elementDescription}</p>
-  <p><a href="/">back</a></p>
-</body>
-</html>`;
-
 var header, body;
 const server = http.createServer((req, res) => {
   if(req.method === 'GET') {
@@ -43,9 +27,27 @@ const server = http.createServer((req, res) => {
         fileName = body.elementName + ".html";
         fs.exists("./public/"+fileName, (exists) => {
           if(!exists) {
+            var newFile = `<!DOCTYPE html>
+            <html lang="en">
+            <head>
+              <meta charset="UTF-8">
+              <title>The Elements - ${body.elementName}</title>
+              <link rel="stylesheet" href="/css/styles.css">
+            </head>
+            <body>
+              <h1>${body.elementName}</h1>
+              <h2>${body.elementSymbol}</h2>
+              <h3>Atomic number ${body.elementAtomicNumber}</h3>
+              <p>${body.elementDescription}</p>
+              <p><a href="/">back</a></p>
+            </body>
+            </html>`;
             fs.writeFile('./public/'+fileName, newFile, (err) => {
               if(err) throw err;
             });
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.end('{"success" : true}');
           }
           //send diff status code
         });

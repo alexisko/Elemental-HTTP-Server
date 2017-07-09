@@ -48,7 +48,7 @@ const server = http.createServer((req, res) => {
               <h2>${body.elementSymbol}</h2>
               <h3>Atomic number ${body.elementAtomicNumber}</h3>
               <p>${body.elementDescription}</p>
-              <p><a href="/">back</a></p>
+              <p><a href="/public/index.html">back</a></p>
             </body>
             </html>`;
             fs.writeFile('./public/'+fileName, newFile, (err) => { // Create file
@@ -58,14 +58,17 @@ const server = http.createServer((req, res) => {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
             res.end('{"success" : true}');
-            //Update index.html
-            // index = fs.readFileSync('./public/index.html', 'utf8');
-            // index = index.split("\n");
-            // newLink =  `
-            // <li>
-            //   <a href="public/${fileName}">${body.elementName}</a>
-            // </li>`;
-            // console.log("INDEX.HTML "+index);
+            // Update index.html
+            index = fs.readFileSync('./public/index.html', 'utf8');
+            index = index.split("\n");
+            newLink =  `
+            <li>
+              <a href="public/${fileName}">${body.elementName}</a>
+            </li>`;
+            index.splice(index.indexOf("  </ol>"), 0, newLink);
+            index = index.join("\n");
+            fs.writeFileSync('./public/index.html', index, 'utf8');
+            console.log(index);
           }
           //send diff status code
         });

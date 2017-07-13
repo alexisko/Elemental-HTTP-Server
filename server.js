@@ -74,9 +74,35 @@ const server = http.createServer((req, res) => {
         });
       });
     }
+  //PUT METHOD
   } else if(req.method === 'PUT') {
-
+    fs.exists("."+req.url, (exists) => {
+      if(exists) {
+        // Response body for PUT
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end('{"success" : true}');
+      } else {
+        // Response body for PUT
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(`{ "error" : "resource ${req.url} does not exist" }`);
+      }
+    });
+  //DELETE METHOD
   } else if(req.method === 'DELETE') {
-
+    fs.exists("."+req.url, (exists) => {
+      if(exists) {
+        // Response body for DELETE
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.end('{"success" : true}');
+      } else {
+        // Response body for PUT
+        res.statusCode = 500;
+        res.setHeader('Content-Type', 'application/json');
+        res.end(`{ "error" : "resource ${req.url} does not exist" }`);
+      }
+    });
   }
 }).listen(8080);

@@ -18,6 +18,7 @@ const server = http.createServer((req, res) => {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'text/html');
           body = fs.readFileSync("."+req.url, 'utf8');
+          createIndexLinks();
           res.end(body);
         }
       } else { //If file does not exist, return 404.html file in response body
@@ -59,17 +60,8 @@ const server = http.createServer((req, res) => {
             res.setHeader('Content-Type', 'application/json');
             res.end('{"success" : true}');
             // Update index.html
-            index = fs.readFileSync('./public/index.html', 'utf8');
-            index = index.split("\n");
-            newLink =  `
-            <li>
-              <a href="public/${fileName}">${body.elementName}</a>
-            </li>`;
-            index.splice(index.indexOf("  </ol>"), 0, newLink);
-            index = index.join("\n");
-            fs.writeFileSync('./public/index.html', index, 'utf8');
+            createIndexLinks();
           }
-          //send diff status code
         });
       });
     } else {
@@ -111,15 +103,7 @@ const server = http.createServer((req, res) => {
             //
           } else { //file doesn't exist create new link
             // Update index.html
-            index = fs.readFileSync('./public/index.html', 'utf8');
-            index = index.split("\n");
-            newLink =  `
-            <li>
-              <a href="public/${fileName}">${body.elementName}</a>
-            </li>`;
-            index.splice(index.indexOf("  </ol>"), 0, newLink);
-            index = index.join("\n");
-            fs.writeFileSync('./public/index.html', index, 'utf8');
+            createIndexLinks();
           }
         } else {
           // Response body for PUT
@@ -138,6 +122,7 @@ const server = http.createServer((req, res) => {
           res.statusCode = 200;
           res.setHeader('Content-Type', 'application/json');
           res.end('{"success" : true}');
+          createIndexLinks();
         });
       } else {
         // Response body for PUT
@@ -145,6 +130,41 @@ const server = http.createServer((req, res) => {
         res.setHeader('Content-Type', 'application/json');
         res.end(`{ "error" : "resource ${req.url} does not exist" }`);
       }
+    });
+  }
+
+  function createIndexLinks() {
+    var links = "";
+    fs.readdir('./public/', 'utf8', (err, file) => {
+      file = file.filter((val) => {
+        return val !== 'index.html' && val !== '404.html' && val.includes('.html');
+      });
+      for(var i = 0; i < file.length; i++) {
+        links += `
+        <li>
+          <a href="/public/${file[i]}">${file[i].slice(0, -5)}</a>
+        </li>`;
+      }
+
+      var newIndex = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>The Elements</title>
+        <link rel="stylesheet" href="/public/css/styles.css">
+      </head>
+      <body>
+        <h1>The Elements</h1>
+        <h2>These are all the known elements.</h2>
+        <h3>These are 2</h3>
+        <ol>
+          ${links}
+        </ol>
+      </body>
+      </html>`;
+
+      fs.writeFileSync('./public/index.html', newIndex, 'utf8');
     });
   }
 }).listen(8080);
